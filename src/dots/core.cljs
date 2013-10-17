@@ -1,10 +1,9 @@
 (ns dots.core
   (:require
-   
    [cljs.core.async :as async
     :refer [<! >! chan close! sliding-buffer put! alts! timeout]]
    [jayq.core :refer [$ append ajax inner css $deferred
-                      when done resolve pipe on bind attr
+                      done resolve pipe on bind attr
                       offset] :as jq]
    [jayq.util :refer [log]]
    [crate.core :as crate]
@@ -65,7 +64,7 @@
           (recur (<! input-chan))))
     out-chan))
 
-(def dot-colors [:blue :green :yellow :purple :red])  
+(def dot-colors [:blue :green :yellow :purple :red])
 (def offscreen-dot-position 8)
 (def board-size 6)
 (def number-colors (count dot-colors))
@@ -99,7 +98,7 @@
     [:div {:class (str "dot levelish " (name color)) :style style}]))
 
 (defn colorize-word [word]
-  (map (fn [x c] [:span {:class (name c)} x]) word (rand-colors)))
+  (map (fn [x c] [:span {:class (name c)} x]) word (rand-colors nil)))
 
 (defn start-screen []
   [:div.dots-game
@@ -118,7 +117,7 @@
 
 (defn board [{:keys [board] :as state}]
   [:div.dots-game
-   [:div.header 
+   [:div.header
     [:div.heads "Time " [:span.time-val]]
     [:div.heads "Score " [:span.score-val]]]
    [:div.board-area
@@ -203,9 +202,9 @@
         length (- grid-unit-size dot-size)
         vertical (= left1 left2)
         [width height] (if vertical [4 length] [length 4])
-        [off-left off-top] (if vertical [-3 11] [11 -3])        
+        [off-left off-top] (if vertical [-3 11] [11 -3])
         style (str "width: " width "px;"
-                   "height: " height "px;" 
+                   "height: " height "px;"
                    "top: " (+ (min top1 top2) off-top) "px;"
                    "left: " (+ (min left1 left2) off-left) "px;")]
     [:div {:style style :class (str "line " (name (or color :blue)) (if (< width height) " vert" " horiz" ))}]))
@@ -351,7 +350,7 @@
 (defn create-board []
   (vec
    (map-indexed
-    (fn [i x] (vec (map-indexed (partial create-dot i) (take board-size (rand-colors))))) 
+    (fn [i x] (vec (map-indexed (partial create-dot i) (take board-size (rand-colors nil)))))
     (range board-size))))
 
 (defn setup-game-state []
@@ -397,7 +396,7 @@
      (loop []
        (let [{:keys [score]} (<! (game-loop (setup-game-state) draw-ch))]
          (render-screen (score-screen score)))
-       (<! (select-chan #(= [:start-new-game] %) [start-chan draw-ch]))       
+       (<! (select-chan #(= [:start-new-game] %) [start-chan draw-ch]))
        (recur)))))
 
 

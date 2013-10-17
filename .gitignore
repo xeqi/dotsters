@@ -10,9 +10,10 @@ pom.xml.asc
 .lein-failures
 .lein-plugins
 .lein-repl-history
-/resources/public/js/compiled_
+/resources/public/js/compiled
 \#*
 \.\#*
 .DS_Store
 .repl
 out/
+.nrepl-port
